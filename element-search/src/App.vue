@@ -10,9 +10,9 @@
         <el-radio v-model="look_type" :label="2" border >俘虏</el-radio>
         <el-radio v-model="look_type" :label="3" border >老干妈</el-radio>
       </el-header>
-      <element-search :options="queryOptions" :queryInit="queryInit" :querydata.sync="query"></element-search>
+      <element-search :querydata.sync="query"></element-search>
       <el-header>
-        <el-button @click="fetchList()" class="searchBtn" type="primary">查询配料</el-button>
+        <el-button @click="queryStm()" class="searchBtn" type="primary">查询配料</el-button>
       </el-header>
       <el-main>
         <el-table :data="dataList" v-loading="tableLoading" border :key="topTab">
@@ -24,30 +24,22 @@
               :key="item.id"
               :label="item.label"
               :prop="item.prop"
-              fixed="left"
             ></el-table-column>
             <el-table-column
               align="center"
               v-if="item.slot"
               :label="item.label"
               :key="item.id"
-              fixed="left"
             >
             <template slot-scope="{ row }">
-              <div @click="switchDetail(row,item.prop)"
-              >{{ row[item.slot] }}</div>
+              <el-button @click="showAnswer(row.total)" v-if="item.slot === 'carrot'" type="primary"
+              >一日三餐没烦恼，就吃什么？</el-button>
+              <el-button @click="switchWithPara()" v-if="item.slot === 'zhibo'" type="primary"
+              >兄弟们把彳亍！打在老八的搜索框里！</el-button>
             </template>
             </el-table-column>
           </template>
         </el-table>
-        <!-- 分页 -->
-        <el-pagination
-          @current-change="pageChangeHandler"
-          layout="total,prev, next,jumper"
-          :total="listCount"
-          :current-page.sync="query.page"
-          :page-size="query.pagesize"
-        ></el-pagination>
       </el-main>
     </el-container>
   </div>
@@ -68,9 +60,7 @@ export default {
       //查询组
       query:{},
       look_type: 1,
-      queryOptions:[],
       listCount:0,
-      queryInit:{},
       //表格
       tableLoading: false,
       dataList: [],
@@ -88,67 +78,71 @@ export default {
             { id:2,prop: "total", label: "晓汉堡" },
             { id:3,prop: "daoxiao_count", label: "柠檬" },
             { id:4,prop: "measure_count", label: "嘎嘣脆跌" },
-            { id:5,prop: "unmeasure_count", label: "胡萝贝" }
+            { id:5,prop: "unmeasure_count", label: "问题" ,slot:'carrot'}
           ];
-          this.excelOptions = [
-            {label:'全部',value:''},
-            {label:'体温异常的人数',value:'1'},
-            {label:'未测量的人数',value:'2'},
-            {label:'体温过高的人数',value:'3'},
-            {label:'体温过低的人数',value:'4'},
-            {label:'体温正常的人数',value:'5'},
-            {label:'已测量的人数',value:'6'},
-          ]
-          this.queryOptions = ['time_range']
+          const {xiaohanbao} = this.query
           this.look_type = 1;
+          this.query = {xiaohanbao}
         } else {
           this.tableConfigs = [
-            { id:1,prop: "name", label: "学生姓名" },
-            { id:2,prop: "grade_class", label: "年级/班级" },
-            { id:3,prop: "total_days", label: "应测量天数/天" },
-            { id:4,prop: "measure_days",label:"已测量天数/天" },
-            { id:5,prop: "abnormal_days",label:"异常天数/天" },
-            { id:6,prop: "low_times",label:"体温过低/次" },
-            { id:7,prop: "high_times",label:"体温过高/次" },
+            { id:1,prop: "name", label: "迷hotel" },
+            { id:2,prop: "grade_class", label: "牛奶milk" },
+            { id:3,prop: "total_days", label: "喜之郎cc果冻" },
+            { id:4,prop: "measure_days",label:"烤面筋~" },
+            { id:6,slot: "zhibo",label:"参观一下老八的直播间" }
           ];
-          this.excelOptions = [
-            {label:'全部',value:''},
-            {label:'异常体温数据',value:'1'},
-            {label:'体温过高的数据',value:'2'},
-            {label:'体温过低的数据',value:'3'},
-            {label:'体温正常的数据',value:'4'}
-          ]
-          this.queryOptions = ['time_range','grade_id','class_id','student_name','temperature_status','measure_status']
+          this.query = {zmchi : '',srceam:''}
         }
-        this.$nextTick().then(()=>{
-          this.fetchList()
-          this.queryInit = {};
-        })
+        this.fetchList()
       },
       immediate:true
     },
     look_type: {
       handler(v){
         if(v === 1){
-          this.queryOptions = ['time_range']
+          this.query = {xiaohanbao : ''}
         }else if(v === 2){
-          this.queryOptions = ['time_range','grade_id']
+          this.query = {xiaohanbao : '',cheshuo : '',}
         }else if(v === 3){
-          this.queryOptions = ['time_range','grade_id','class_id']
+          this.query = {delicious : ''}
         }
       }
     }
   },
   methods: {
+    queryStm(){
+      console.log(this.query)
+    },
     //点击跳转的方法
-    switchDetail(row,prop){
-      if(row[prop] === 0){
-        return
-      }
-      this.topTab = 2
+    showAnswer(a){
+      console.log(a)
+      this.$message.success(`就吃老八秘制晓汉堡`)
+    },
+    switchWithPara(){
+      this.query.xiaohanbao = '彳亍！彳亍！彳亍！彳亍！'
+      this.topTab = 1
     },
     //私有获取列表的方法
     fetchList(){
+      if(this.topTab === 1){
+        this.dataList = [
+          {
+            day:'3份',
+            total:'5份',
+            daoxiao_count:'12份',
+            measure_count:'56份',
+          }
+        ]
+      }else{
+        this.dataList = [
+          {
+            name:'3份',
+            grade_class:'5份',
+            total_days:'12份',
+            measure_days:'56份',
+          }
+        ]
+      }
     },
     //分页器
     pageChangeHandler(v) {
