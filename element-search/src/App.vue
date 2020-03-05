@@ -71,7 +71,7 @@ export default {
     //左上角tab
     topTab: {
       handler(v) {
-        //抓取数据
+        //获取数据
         if (v === 1) {
           this.tableConfigs = [
             { id:1,prop: "day", label: "扒鸭屁股" },
